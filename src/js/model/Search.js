@@ -20,7 +20,7 @@ export default class Search {
         //   );
         //   console.log(result);
         } catch (error) {
-          alert("aldaa : " + error);
+          console.log("aldaa : " + error);
         }
       }
 
