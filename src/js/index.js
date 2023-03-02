@@ -9,12 +9,12 @@ import List from "./model/List";
 import * as listView from "./view/listView";
 import Like from "./model/Like";
 import * as likesView from "./view/likeView";
+
 /*
 web app tolov
 - hailtiin ur dun
 - jor detail
 - like
-- order detail
 */
 
 const state = {};
