@@ -7,7 +7,8 @@ import Recipe from "./model/Recipe";
 import {renderRecipe, clearRecipe, activeRecipe } from "./view/recipeView";
 import List from "./model/List";
 import * as listView from "./view/listView";
-
+import Like from "./model/Like";
+import * as likesView from "./view/likeView";
 /*
 web app tolov
 - hailtiin ur dun
@@ -50,6 +51,7 @@ const controlSearch = async () =>{
 const controlRecipe = async () => {
   // url id awah
   const id = window.location.hash.replace('#','');
+  if(!state.like) state.like = new Like();
 
   if( id ){
     // active recipe
@@ -73,7 +75,7 @@ const controlRecipe = async () => {
     clearLoader();
 
     // joroo delgetsend gargah
-    renderRecipe(state.recipe);
+    renderRecipe(state.recipe, state.like.isLiked(id));
   }
 }
 
@@ -87,11 +89,43 @@ const controlList = () =>{
 
   // modelruu nairlaga ilgeeh
   state.recipe.ingredients.forEach(n => {
-    state.list.addItem(n)
-    listView.renderItem(n);
+    const item = state.list.addItem(n)
+    listView.renderItem(item);
   });
+}
 
-  // state.recipe.ingredients
+// like controller
+const controlLike = () =>{
+  // model
+  if(!state.like) state.like = new Like();
+
+  // odoo baigaa jor id oloh
+  const currentRecipeId = state.recipe.id;
+
+  // jor like darsan eshees hamaarch hadgalah ustgah
+  if( state.like.isLiked(currentRecipeId) ){
+    // model-s ustgah
+    state.like.deleteLike(currentRecipeId);
+
+    // likeTowchnii haragdah baidal
+    likesView.toggleLikeButton(false);
+
+    // liked tsesmees hasah
+    likesView.deleteLike(currentRecipeId);
+  } else {
+    const newLike = state.like.addLike( 
+      currentRecipeId, 
+      state.recipe.title, 
+      state.recipe.publisher, 
+      state.recipe.image_url 
+    );
+
+    likesView.toggleLikeButton(true);
+    likesView.renderLike(newLike);
+  }
+
+  // likeMenu
+  likesView.toggleLikeMenu(state.like.getTotalLike());
 }
 
 elements.searchForm.addEventListener('submit', e => {
@@ -112,7 +146,36 @@ elements.pageButtons.addEventListener('click', e => {
 elements.recipeDiv.addEventListener('click', e => {
   if( e.target.matches(`${elements.addCartButton}, ${elements.addCartButton} *`) ){
     controlList();
+  } else if(e.target.matches(`${elements.likeButtonClassName}, ${elements.likeButtonClassName} *`)){
+    controlLike();
+  }
+});
+
+elements.shoppingList.addEventListener('click', e => {
+  // btn oloh
+  if( e.target.matches(`${elements.shoppingRemoveItemBtn}, ${elements.shoppingRemoveItemBtn} *`) ){
+    // id oloh
+    
+    const id = e.target.closest('.shopping__item').dataset.itemid;
+    // models- oloh
+    
+    if( id ) state.list.deleteItem(id); 
+    // delgetsees hasah
+    listView.deleteItem(id);
   }
 });
 
 ['hashchange','load'].forEach(event => window.addEventListener(event,controlRecipe));
+
+window.addEventListener('load', e => {
+  // load hiihed like model duudna.
+  if(!state.like) state.like = new Like();
+
+  // likes menu haruulah eseh
+  likesView.toggleLikeMenu(state.like.getTotalLike());
+
+  // like bwal render hiine
+  if( state.like.getTotalLike() > 0 ){
+    state.like.likes.forEach(e => likesView.renderLike(e));
+  }
+});

@@ -7,7 +7,12 @@ export const elements = {
     recipeDiv: document.querySelector('.recipe'),
     activeRecipeClass: 'results__link--active',
     addCartButton: '.recipe__btn',
-    shoppingList: document.querySelector('.shopping__list')
+    shoppingList: document.querySelector('.shopping__list'),
+    shoppingRemoveItemBtn: '.shopping__delete',
+    likeButtonClassName: '.recipe__love',
+    likesMenu: document.querySelector('.likes__field'),
+    likeList: document.querySelector('.likes__list'),
+    likedItemClassName: '.likes__link',
 };
 
 export const elementString = {
